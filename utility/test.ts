@@ -2,7 +2,7 @@ const CreateVendorTest = {
     "name": "Vitor",
     "address": "Street Address",
     "email": "email@vitor.com",
-    "foodType": ["japanese", "vegetarian"],
+    "foodTypes": ["japanese", "vegetarian"],
     "ownerName": "ownerName",
     "password": "password",
     "phone": "8834565456",
