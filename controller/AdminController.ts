@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { CreateVendorInput } from "../dto/Vendor.dto";
+import { CreateVendorInput } from "../dto";
 import { Vendor, VendorDocument } from "../models";
 import { Document } from "mongoose";
 import { GeneratePassword, GenerateSalt } from "../utility";
