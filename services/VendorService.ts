@@ -1,7 +1,9 @@
 import { AuthPayload, CreateVendorInput, EditVendorInput, VendorLoginInput } from "../dto";
 import { Vendor, VendorDocument } from "../models";
-import { Document } from "mongoose";
 import { GeneratePassword, GenerateSalt, GenerateSignature, ValidatePassword } from "../utility";
+import { DocumentDTO } from "../dto/Common.dto";
+import { CreateFoodInputs } from "../dto/Food.dto";
+import { createFood } from "./FoodServices";
 
 const findOne = async <T>(filter: Partial<T>) => {
     return await Vendor.findOne(filter);
@@ -27,7 +29,7 @@ const findOneById = <T>(id: string) => {
     });
 };
 
-const findOneByIdAndUpdate = (id: string | undefined, editValues: Partial<VendorDocument>): Promise<Document<VendorDocument> | null>  => {
+const findOneByIdAndUpdate = (id: string | undefined, editValues: Partial<VendorDocument>): Promise<DocumentDTO<VendorDocument> | null>  => {
     return new Promise((resolve, reject) => {
         if(!id) {
             reject("Call Without Id.");
@@ -47,7 +49,7 @@ const findOneByIdAndUpdate = (id: string | undefined, editValues: Partial<Vendor
 };
 
 
-export const findVendors = (): Promise<Document<VendorDocument>[]>  => {
+export const findVendors = (): Promise<DocumentDTO<VendorDocument>[]>  => {
     return new Promise((resolve, reject) => {
         (async () => { 
             const vendors = await Vendor.find();
@@ -59,7 +61,7 @@ export const findVendors = (): Promise<Document<VendorDocument>[]>  => {
     });
 };
 
-export const findVendor = async <T>(id: string | undefined | null, email?: string | undefined): Promise<Document<VendorDocument> | null> => {
+export const findVendor = async <T>(id: string | undefined | null, email?: string | undefined): Promise<DocumentDTO<VendorDocument> | null> => {
     return new Promise((resolve, reject) => {
         (async () => { 
             try {
@@ -84,7 +86,7 @@ export const findVendorByEmail = <T>(email: string | undefined) => {
     return findOne({ email });//findVendor(null, email);
 };
 
-export const createVendorService = (vendor: CreateVendorInput): Promise<Document<VendorDocument>>  => {
+export const createVendorService = (vendor: CreateVendorInput): Promise<DocumentDTO<VendorDocument>>  => {
     return new Promise((resolve, reject) => {
         (async () => { 
             const hasVendor = await findOne({ email: vendor.email });
@@ -93,7 +95,7 @@ export const createVendorService = (vendor: CreateVendorInput): Promise<Document
             }
             const salt = await GenerateSalt();
             const password = await GeneratePassword(vendor.password, salt);
-            const createVendor = await Vendor.create({ ...vendor, salt, password });
+            const createVendor = await Vendor.create({ foods: [], ...vendor, salt, password });
             resolve(createVendor);
         })()
     });
@@ -121,31 +123,18 @@ export const vendorLogin = (vendor: VendorLoginInput): Promise<string>  => {
     });
 };
 
-export const vendorProfile = (user?: AuthPayload): Promise<Document<VendorDocument>>  => {
-    return new Promise((resolve, reject) => {
-        if(user) {
-            const vendor = findVendorById(user._id);
-            if(vendor !== null) {
-                resolve(vendor as Promise<Document<VendorDocument>>);
-            }
-        }
-        reject("Profile Not Found.");
-    });
-};
-
-export const updateVendorProfile = (user: AuthPayload | undefined, editVendor: EditVendorInput): Promise<Document<VendorDocument> | null>  => {
-    return findOneByIdAndUpdate(user?._id, editVendor);
-};
-
-export const updateVendorService = (user: AuthPayload | undefined): Promise<Document<VendorDocument> | null>  => {
+export const getVendorByUser = (user: AuthPayload | undefined): Promise<DocumentDTO<VendorDocument>>  => {
     return new Promise((resolve, reject) => {
         if(user) {
             (async () => {
-                const vendor = await findVendorById(user._id);
-                if(vendor) {
-                    vendor.serviceAvailable = !vendor.serviceAvailable;
-                    const result = await vendor.save();
-                    resolve(result);
+                try {
+                    const vendor = await findVendorById(user._id);
+                    if(vendor !== null) {
+                        resolve(vendor);
+                    }
+                    reject("Profile Not Found.");
+                } catch (error) {
+                    reject("Profile Not Found.");
                 }
             })();
         }
@@ -153,4 +142,29 @@ export const updateVendorService = (user: AuthPayload | undefined): Promise<Docu
             reject("Profile Not Found.");
         }
     });
+};
+
+export const vendorProfile = (user?: AuthPayload): Promise<DocumentDTO<VendorDocument>>  => {
+    return getVendorByUser(user);
+};
+
+export const updateVendorProfile = (user: AuthPayload | undefined, editVendor: EditVendorInput): Promise<DocumentDTO<VendorDocument> | null>  => {
+    return findOneByIdAndUpdate(user?._id, editVendor);
+};
+
+export const updateVendorService = (user: AuthPayload | undefined): Promise<DocumentDTO<VendorDocument>>  => {
+    return getVendorByUser(user)
+        .then((vendor) => {
+            vendor.serviceAvailable = !vendor.serviceAvailable;
+            return vendor.save();
+        });
+};
+
+export const addFoodVendor = (user: AuthPayload | undefined, foodInputs: CreateFoodInputs): Promise<DocumentDTO<VendorDocument>>  => {
+    return getVendorByUser(user)
+        .then(async (vendor) => {
+            const food = await createFood(vendor._id, foodInputs);
+            vendor.foods.push(food);
+            return vendor.save();
+        });
 };

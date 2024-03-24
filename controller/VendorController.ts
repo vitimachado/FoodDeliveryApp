@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { EditVendorInput, VendorLoginInput } from "../dto";
-import { updateVendorProfile, updateVendorService, vendorLogin, vendorProfile } from "../services";
+import { addFoodVendor, updateVendorProfile, updateVendorService, vendorLogin, vendorProfile } from "../services";
+import { CreateFoodInputs } from "../dto/Food.dto";
+import { getFoods } from "../services/FoodServices";
 
 export const VendorLogin = (req: Request, res: Response, next: NextFunction) => {
     const vendor = <VendorLoginInput>req.body;
@@ -34,6 +36,25 @@ export const UpdateVendorProfile = (req: Request, res: Response, next: NextFunct
 export const UpdateVendorService = (req: Request, res: Response, next: NextFunction) => {
     const editVendor = <EditVendorInput>req.body;
     updateVendorService(req.user)
+    .then((result) => {
+        return res.json(result);
+    }).catch((err) => {
+        return res.json({ error: err });
+    });
+};
+
+export const AddFood = (req: Request, res: Response, next: NextFunction) => {
+    const foodVendor = <CreateFoodInputs>req.body;
+    addFoodVendor(req.user, foodVendor)
+    .then((result) => {
+        return res.json(result);
+    }).catch((err) => {
+        return res.json({ error: err });
+    });
+};
+
+export const GetFoods = (req: Request, res: Response, next: NextFunction) => {
+    getFoods(req.user)
     .then((result) => {
         return res.json(result);
     }).catch((err) => {

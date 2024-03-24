@@ -13,7 +13,7 @@ export interface VendorDocument extends Document {
     serviceAvailable: boolean;
     coverImage: [string];
     rating: number;
-    // foods: any;
+    foods: any;
 };
 
 const VendorSchema = new Schema({
@@ -29,10 +29,10 @@ const VendorSchema = new Schema({
     serviceAvailable: { type: Boolean, default: false },
     coverImage: { type: [String], default: [] },
     rating: { type: Number, default: 0 },
-    // foods: [{
-    //     type: mongoose.SchemaTypes.ObjectId,
-    //     ref: 'food'
-    // }]
+    foods: [{
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'food'
+    }]
 }, {
     toJSON: {
         transform(doc, ret){
