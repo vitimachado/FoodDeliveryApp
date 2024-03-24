@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { EditVendorInput, VendorLoginInput } from "../dto";
 import { CreateFoodInputs } from "../dto/Food.dto";
-import { getFoods } from "../services/FoodServices";
 import VendorService from "../services/VendorService";
+import FoodService from "../services/FoodServices";
 
 export const VendorLogin = (req: Request, res: Response, next: NextFunction) => {
     const vendor = <VendorLoginInput>req.body;
@@ -54,7 +54,7 @@ export const AddFood = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const GetFoods = (req: Request, res: Response, next: NextFunction) => {
-    getFoods(req.user)
+    FoodService.getFoods(req.user)
     .then((result) => {
         return res.json(result);
     }).catch((err) => {

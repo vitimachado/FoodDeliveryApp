@@ -3,8 +3,8 @@ import { Vendor, VendorDocument } from "../models";
 import { GeneratePassword, GenerateSalt, GenerateSignature, ValidatePassword } from "../utility";
 import { DocumentDTO } from "../dto/Common.dto";
 import { CreateFoodInputs } from "../dto/Food.dto";
-import { createFood } from "./FoodServices";
 import { BaseDbService } from "./CommonDbService";
+import FoodService from "./FoodServices";
 
 class VendorServiceClass extends BaseDbService<VendorDocument>{
     constructor() {
@@ -24,7 +24,7 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
                 }
                 const salt = await GenerateSalt();
                 const password = await GeneratePassword(vendor.password, salt);
-                const createVendor = await Vendor.create({ foods: [], ...vendor, salt, password });
+                const createVendor = await this.dbModel.create({ foods: [], ...vendor, salt, password });
                 resolve(createVendor);
             })()
         });
@@ -78,10 +78,18 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
     addFoodVendor = (user: AuthPayload | undefined, foodInputs: CreateFoodInputs): Promise<DocumentDTO<VendorDocument>>  => {
         return this.getVendorByUser(user)
             .then(async (vendor) => {
-                const food = await createFood(vendor._id, foodInputs);
+                const food = await FoodService.createFood(vendor._id, foodInputs);
                 vendor.foods.push(food);
                 return vendor.save();
             });
+    };
+
+    getAvailableFoods = (pinCode?: string): Promise<DocumentDTO<VendorDocument>> => {
+        return VendorService.find(
+            { pinCode, serviceAvailable: true},
+            { rating: "descending" },
+            'foods'
+        )
     };
 }
 
