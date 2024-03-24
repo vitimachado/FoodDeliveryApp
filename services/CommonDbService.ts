@@ -25,18 +25,18 @@ export class BaseDbService<T> {
     
     private findQuery = (options?: QueryFind<T>, findOne = false): Promise<any>  => {
         return new Promise((resolve, reject) => {
-            try {
-                (async () => { 
+            (async () => { 
+                try {
                     const result = findOne ? await findOneQuery(this.dbModel, options) :
-                                             await findQuery(this.dbModel, options);
+                                            await findQuery(this.dbModel, options);
                     if(result === null) {
                         reject("Data not available.");
                     }
                     resolve(result);
-                })()
-            } catch (error) {
-                reject("Data not available.");
-            }
+                } catch (error) {
+                    reject("Data not available.");
+                }
+            })();
         });
     };
 
@@ -45,14 +45,14 @@ export class BaseDbService<T> {
     };
 
     findOne = (filter: FilterQuery<T>, populate?: string): Promise<any>  => {
-        return this.findQuery({ filter, populate }, true);
+        return this.findQuery({ filter, populate }, true)
     };
 
-    findOneById = (id: string, populate?: string): Promise<any>  => {
+    findById = (id: string, populate?: string): Promise<any>  => {
         return this.findQuery({ filter: { _id: id }, populate}, true);
     };
 
-    findOneByIdAndUpdate = (id: string | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
+    findByIdAndUpdate = (id: string | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
         return new Promise((resolve, reject) => {
             if(!id) {
                 reject("Call Without Id.");

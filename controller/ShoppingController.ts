@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { findVendor } from "../services";
 import { Vendor } from "../models";
+import VendorService from "../services/VendorService";
 
 export const GetFoodAvailability = async (req: Request, res: Response, next: NextFunction) => {
     const pinCode = req.params.pinCode;
-    findVendor({ pinCode, serviceAvailable: true})
+    VendorService.find({ pinCode, serviceAvailable: true})
     Vendor.find()
     .then(result => {
         return res.status(200).json(result);
