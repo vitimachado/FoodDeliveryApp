@@ -3,6 +3,7 @@ import { CreateVendorInput } from "../dto";
 import { Vendor, VendorDocument } from "../models";
 import { Document } from "mongoose";
 import { GeneratePassword, GenerateSalt } from "../utility";
+import { findVendors } from "../services";
 
 const findOne = async <T>(filter: Partial<T>) => {
     return await Vendor.findOne(filter);
@@ -28,17 +29,17 @@ const findOneById = async <T>(id: string) => {
     });
 };
 
-const findVendors = (): Promise<Document<VendorDocument>[]>  => {
-    return new Promise((resolve, reject) => {
-        (async () => { 
-            const vendors = await Vendor.find();
-            if(vendors === null) {
-                reject("Data not available.");
-            }
-            resolve(vendors);
-        })()
-    });
-};
+// const findVendors = (): Promise<Document<VendorDocument>[]>  => {
+//     return new Promise((resolve, reject) => {
+//         (async () => { 
+//             const vendors = await Vendor.find();
+//             if(vendors === null) {
+//                 reject("Data not available.");
+//             }
+//             resolve(vendors);
+//         })()
+//     });
+// };
 
 const findVendor = async <T>(id: string | undefined, email: string | undefined) => {
     return new Promise((resolve, reject) => {
