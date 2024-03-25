@@ -1,60 +1,31 @@
 import { NextFunction, Request, Response } from "express";
 import VendorService from "../services/VendorService";
+import { responseHandle } from "../utility/CommonUtility";
 
 export const GetFoodAvailability = async (req: Request, res: Response, next: NextFunction) => {
     const pinCode = req.params.pinCode;
-    VendorService.getAvailableFoods(pinCode)
-    .then(result => {
-        return res.status(200).json(result);
-    })
-    .catch(err => {
-        return res.status(400).json({ message: err });
-    });
+    responseHandle(res, VendorService.getAvailableFoods(pinCode));
 };
 
 export const GetTopRestaturants = async (req: Request, res: Response, next: NextFunction) => {
     const pinCode = req.params.pinCode;
     const limit = Number(req.params.limit || 0);
-    VendorService.getTopRestaturants(pinCode, limit)
-    .then(result => {
-        return res.status(200).json(result);
-    })
-    .catch(err => {
-        return res.status(400).json({ message: err });
-    });
+    responseHandle(res, VendorService.getTopRestaturants(pinCode, limit));
 };
 
 export const GetFoodsAvaiableByReadyTime = async (req: Request, res: Response, next: NextFunction) => {
     const pinCode = req.params.pinCode;
     const lessThan = Number(req.params.lessThan || 30);
-    VendorService.getFoodAvaiableByReadyTime(pinCode, lessThan)
-    .then(result => {
-        return res.status(200).json(result);
-    })
-    .catch(err => {
-        return res.status(400).json({ message: err });
-    });
+    responseHandle(res, VendorService.getFoodAvaiableByReadyTime(pinCode, lessThan));
 };
 
 export const GetSearchFood = async (req: Request, res: Response, next: NextFunction) => {
     const pinCode = req.params.pinCode;
     const foods = <string[]>req.body;
-    VendorService.getFoods(pinCode, foods)
-    .then(result => {
-        return res.status(200).json(result);
-    })
-    .catch(err => {
-        return res.status(400).json({ message: err });
-    });
+    responseHandle(res, VendorService.getFoods(pinCode, foods));
 };
 
 export const GetRestaurantById = async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    VendorService.getRestaurantById(id)
-    .then(result => {
-        return res.status(200).json(result);
-    })
-    .catch(err => {
-        return res.status(400).json({ message: err });
-    });
+    responseHandle(res, VendorService.getRestaurantById(id));
 };
