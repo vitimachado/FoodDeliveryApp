@@ -38,8 +38,8 @@ export const GetFoodsAvaiableByReadyTime = async (req: Request, res: Response, n
 
 export const GetSearchFood = async (req: Request, res: Response, next: NextFunction) => {
     const pinCode = req.params.pinCode;
-    const food = req.params.food;
-    VendorService.getFoods(pinCode, !!food ? [food] : undefined)
+    const foods = <string[]>req.body;
+    VendorService.getFoods(pinCode, foods)
     .then(result => {
         return res.status(200).json(result);
     })

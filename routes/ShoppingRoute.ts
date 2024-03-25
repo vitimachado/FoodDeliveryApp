@@ -13,7 +13,7 @@ router.get('/top-restaurants/:limit/:pinCode', GetTopRestaturants);
 router.get('/foods-ready-time-less-than/:lessThan/:pinCode', GetFoodsAvaiableByReadyTime);
 
 /** ----------------------- Search Food ------------------------ **/
-router.get('/search/:pinCode/:food?', GetSearchFood);
+router.post('/search/:pinCode', GetSearchFood);
 
 /** ------------------ Find Restaurant By ID ------------------- **/
 router.get('/restaurant/:id', GetRestaurantById);

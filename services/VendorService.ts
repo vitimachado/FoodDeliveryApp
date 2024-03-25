@@ -6,6 +6,7 @@ import { CreateFoodInputs } from "../dto/Food.dto";
 import { BaseDbService } from "./CommonDbService";
 import FoodService from "./FoodServices";
 import { FoodDocument } from "../models/Food";
+import { checkInArrayIfHasString } from "../utility/CommonUtility";
 
 class VendorServiceClass extends BaseDbService<VendorDocument>{
     constructor() {
@@ -126,7 +127,8 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
             'foods'
         ).then(vendors => {
             return vendors.reduce((acc: [FoodDocument], vendor: VendorDocument) => {
-                const foods = !!foodsSearch && foodsSearch.length > 0 ? vendor.foods.filter((food: FoodDocument) => foodsSearch.includes(food.name)) as [FoodDocument] :
+                const foods = !!foodsSearch && foodsSearch.length > 0 ?
+                                            vendor.foods.filter((food: FoodDocument) => checkInArrayIfHasString(food.name, foodsSearch)) as [FoodDocument] :
                                             vendor.foods;
                 return [ ...acc, ...foods ];
             }, []);
