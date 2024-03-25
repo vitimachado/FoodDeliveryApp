@@ -12,10 +12,6 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
     constructor() {
         super(Vendor);
     }
-
-    findByEmail = (email: string | undefined) => {
-        return this.findOne({ email });
-    };
         
     createVendorService = (vendor: CreateVendorInput): Promise<DocumentDTO<VendorDocument>>  => {
         return new Promise((resolve, reject) => {
@@ -36,15 +32,15 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
         const { email, password } = vendor;
         return new Promise((resolve, reject) => {
             (async () => {
-                const hasVendor = await this.findByEmail(email);
-                if(hasVendor !== null) {
-                    const validation = await ValidatePassword(password, hasVendor.password, hasVendor.salt);
+                const hasUser = await this.findByEmail(email);
+                if(hasUser !== null) {
+                    const validation = await ValidatePassword(password, hasUser.password, hasUser.salt);
                     if(validation) {
                         const signature = GenerateSignature({
-                            _id: hasVendor.id,
-                            email: hasVendor.email,
-                            foodTypes: hasVendor.foodTypes,
-                            name: hasVendor.name
+                            _id: hasUser.id,
+                            email: hasUser.email,
+                            foodTypes: hasUser.foodTypes,
+                            name: hasUser.name
                         })
                         resolve(signature);
                     }
@@ -54,15 +50,8 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
         });
     };
 
-    getVendorByUser = (user: AuthPayload | undefined): Promise<DocumentDTO<VendorDocument>>  => {
-        if(!user?._id) {
-            throw new Error('User not found');
-        }
-        return this.findById(user?._id || '');
-    };
-
     vendorProfile = (user?: AuthPayload): Promise<DocumentDTO<VendorDocument>>  => {
-        return this.getVendorByUser(user);
+        return this.findByUser(user);
     };
 
     updateVendorProfile = (user: AuthPayload | undefined, editVendor: EditVendorInput): Promise<DocumentDTO<VendorDocument> | null>  => {
@@ -70,7 +59,7 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
     };
 
     updateVendorService = (user: AuthPayload | undefined): Promise<DocumentDTO<VendorDocument>>  => {
-        return this.getVendorByUser(user)
+        return this.findByUser(user)
             .then((vendor) => {
                 vendor.serviceAvailable = !vendor.serviceAvailable;
                 return vendor.save();
@@ -78,7 +67,7 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
     };
 
     addFoodVendor = (user: AuthPayload | undefined, foodInputs: CreateFoodInputs): Promise<DocumentDTO<VendorDocument>>  => {
-        return this.getVendorByUser(user)
+        return this.findByUser(user)
             .then(async (vendor) => {
                 const food = await FoodService.createFood(vendor._id, foodInputs);
                 vendor.foods.push(food);

@@ -1,4 +1,5 @@
 import { FilterQuery, Model, QueryOptions, SortOrder, UpdateQuery } from "mongoose";
+import { AuthPayload } from "../dto";
 
 type QuerySort<T> = Record<keyof T, SortOrder>;
 type Sort<T> = Partial<QuerySort<T>>;
@@ -67,5 +68,16 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
                 }
             })()
         });
+    };
+
+    findByUser = <T = any>(user: AuthPayload | undefined): Promise<T>  => {
+        if(!user?._id) {
+            throw new Error('User not found');
+        }
+        return this.findById(user?._id || '');
+    };
+
+    findByEmail = (email: string | undefined) => {
+        return this.findOne({ email });
     };
 }

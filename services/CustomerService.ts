@@ -1,86 +1,121 @@
-import { plainToClass } from "class-transformer";
-import { validate } from "class-validator";
-import { CreateCustomerInputs } from "../dto/Customer.dto";
+import { CreateCustomerInputs, CustomerLoginInput, CustomerLoginInputs, CustomerSignature, EditCustomerInputs } from "../dto/Customer.dto";
 import { Customer, CustomerDocument } from "../models/Customer";
-import { GenerateSalt, GeneratePassword } from "../utility";
+import { GenerateSalt, GeneratePassword, GenerateSignature, ValidatePassword } from "../utility";
 import { BaseDbService } from "./CommonDbService";
-import { GenerateOtp } from "../utility/NotificationUtility";
-
-type PromiseCall = (res: (value: unknown) => void, rej: (value: unknown) => void) => void;
-
-const promiseWrap = (asyncFunction: PromiseCall) => {
-    return new Promise((resolve, reject) => {
-        asyncFunction(resolve, reject);
-    });
-};
+import { promiseWrap, validateAndGetInputs } from "../utility/CommonUtility";
+import { ErrorHandle } from "../dto/Common.dto";
+import { AuthPayload } from "../dto";
 
 class CustomerServiceClass extends BaseDbService<CustomerDocument>{
     constructor() {
         super(Customer);
     }
 
-    customerSignup = async (reqCustomer: CreateCustomerInputs) => {
+    private createSignature = async (data: CustomerDocument) => {
+        const signature = await GenerateSignature({
+            _id: data._id,
+            email: data.email,
+            verified: data.verified
+        });
+        return { signature, verified: data.verified, email: data.email };
+    }
+
+    customerSignUp = async (reqCustomer: CreateCustomerInputs): Promise<CustomerSignature | ErrorHandle> => {
         return promiseWrap(async (resolve, reject) => {
-                const customerInputs = plainToClass(CreateCustomerInputs, reqCustomer);
-                const inputErrors = await validate(customerInputs, { validationError: { target: true }});
+            
+                const [inputErrors, customerInputs] = await validateAndGetInputs(CreateCustomerInputs, reqCustomer);
                 if(inputErrors.length > 0) {
-                    reject(inputErrors);
+                    return reject({ error: 'Validation', status: 400, message: inputErrors });
                 }
+
                 const salt = await GenerateSalt();
                 const password = await GeneratePassword(customerInputs.password, salt);
-            
-                const { otp, expiry } = GenerateOtp();
 
-                console.log("🚀 ~ CustomerServiceClass ~ returnpromiseWrap ~ otp:", {
+                const existingUser = await this.findByEmail(reqCustomer.email);
+
+                if(existingUser != null) {
+                    return reject({ error: 'CreateError', status: 409, message: 'An user already exist with this email.' })
+                }
+
+                const result = await this.dbModel.create({
                     ...customerInputs,
                     password,
                     salt,
-                    otp,
-                    expiry
-                })
-
-                resolve('customerSignup...success')
-
-                // const result = await Customer.create({
-                //     ...customerInputs,
-                //     password,
-                //     salt,
-                //     otp,
-                //     expiry
-                // });
+                });
             
-                // if(result) {
-            
-                // }
+                if(result) {
+                    const signature = await this.createSignature(result);
+                    resolve(signature);
+                }
+                return reject({ error: 'CreateError', status: 500, message: 'Error to create user.' });
         });
     };
-    // customerSignup = async (reqCustomer: CreateCustomerInputs) => {
-        
-    //     return new Promise((resolve, reject) => {
-    //         (async () => {
-    //             const customerInputs = plainToClass(CreateCustomerInputs, reqCustomer);
-    //             const inputErrors = await validate(customerInputs, { validationError: { target: true }});
-    //             if(inputErrors.length > 0) {
-    //                 return reject(inputErrors);
-    //             }
-    //             const salt = await GenerateSalt();
-    //             const password = await GeneratePassword(customerInputs.password, salt);
-            
-    //             const otp = 5698596;
-            
-    //             const result = await Customer.create({
-    //                 ...customerInputs,
-    //                 password,
-    //                 salt,
-    //                 otp
-    //             });
-            
-    //             if(result) {
-            
-    //             }
-    //         })();
-    //     });
-    // };
+
+    customerSignIn = (loginInput: CustomerLoginInput): Promise<CustomerSignature | ErrorHandle>  => {
+        return promiseWrap(async (resolve, reject) => {
+
+                const [inputErrors] = await validateAndGetInputs(CustomerLoginInputs, loginInput);
+                if(inputErrors.length > 0) {
+                    return reject({ error: 'Validation', status: 400, message: inputErrors });
+                }
+
+                const { email, password } = loginInput;
+
+                const result = await this.findByEmail(email);
+                if(result !== null) {
+                    const validation = await ValidatePassword(password, result.password, result.salt);
+                    if(validation) {
+                        const signature = await this.createSignature(result);
+                        resolve(signature);
+                    }
+                }
+                return reject({ error: 'LoginError', status: 401, message: 'Email or password wrong.' });
+        });
+    };
+
+    updateCustomer = (user: AuthPayload | undefined, editInput: EditCustomerInputs): Promise<CustomerDocument | ErrorHandle>  => {
+        return promiseWrap(async (resolve, reject) => {
+
+                const [inputErrors, customerInputs] = await validateAndGetInputs(EditCustomerInputs, editInput);
+                if(inputErrors.length > 0) {
+                    return reject({ error: 'Validation', status: 400, message: inputErrors });
+                }
+
+                const result = await this.findByUser<CustomerDocument>(user);
+                if(result !== null) {
+                    result.firstName = customerInputs.firstName;
+                    result.lastName = customerInputs.lastName;
+                    result.address = customerInputs.address;
+                    const updatedUser = await result.save();
+                    resolve(updatedUser);
+                }
+                return reject({ error: 'LoginError', status: 401, message: 'User Not Found.' });
+        });
+    };
+
+    getCustomerProfile = (user: AuthPayload | undefined): Promise<CustomerDocument | ErrorHandle>  => {
+        return promiseWrap(async (resolve, reject) => {
+                const result = await this.findByUser<CustomerDocument>(user);
+                if(result !== null) {
+                    resolve(result);
+                }
+                return reject({ error: 'LoginError', status: 401, message: 'User Not Found.' });
+        });
+    };
+
+
+    customerVeryfy = (user: AuthPayload | undefined): Promise<CustomerSignature | ErrorHandle>  => {
+        return promiseWrap(async (resolve, reject) => {
+                const result = await this.findByUser<CustomerDocument>(user);
+                if(result !== null) {
+                    result.verified = true;
+                    const updatedUser = await result.save();
+                    const signature = await this.createSignature(updatedUser);
+                    resolve(signature);
+                }
+                return reject({ error: 'LoginError', status: 401, message: 'Email or password wrong.' });
+        });
+    };
 }
 
 const CustomerService = new CustomerServiceClass();

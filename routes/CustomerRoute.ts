@@ -1,5 +1,6 @@
 import express from 'express';
-import { CustomerSignup, CustomerLogin, CustomerVerify, RequestOtp, GetCustomerProfile, EditCustomerProfile } from '../controller';
+import { CustomerSignup, CustomerLogin, CustomerVerify, GetCustomerProfile, EditCustomerProfile } from '../controller';
+import { Authenticate } from '../middlewares/CommonAuth';
 
 const router = express.Router();
 
@@ -9,11 +10,11 @@ router.post('/signup', CustomerSignup);
 /** -------------------------- Login --------------------------- **/
 router.post('/login', CustomerLogin);
 
-/** ------------------- Verify Customer Acount ----------------- **/
-router.patch('/verify', CustomerVerify);
+// Authentication
+router.use(Authenticate);
 
-/** ------------------ OTP / Requesting OTP -------------------- **/
-router.get('/otp', RequestOtp);
+/** ------------------- Verify Customer Acount ----------------- **/
+router.get('/verify', CustomerVerify);
 
 /** ------------------------- Profile -------------------------- **/
 router.get('/profile', GetCustomerProfile);
