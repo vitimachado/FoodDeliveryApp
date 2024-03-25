@@ -103,7 +103,7 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
         )
     };
 
-    getFoodAvaiableByReadyTime(pinCode: string, readTime: number = 0) {
+    getFoodAvaiableByReadyTime = (pinCode: string, readTime: number = 0) => {
         return VendorService.find(
             { pinCode, serviceAvailable: true },
             { rating: "descending" },
@@ -117,6 +117,25 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
             }, []);
         });
     }
+
+    getFoods = (pinCode: string, foodsSearch?: string[]) => {
+        return VendorService.find(
+            { pinCode, serviceAvailable: true },
+            { rating: "descending" },
+            null,
+            'foods'
+        ).then(vendors => {
+            return vendors.reduce((acc: [FoodDocument], vendor: VendorDocument) => {
+                const foods = !!foodsSearch && foodsSearch.length > 0 ? vendor.foods.filter((food: FoodDocument) => foodsSearch.includes(food.name)) as [FoodDocument] :
+                                            vendor.foods;
+                return [ ...acc, ...foods ];
+            }, []);
+        });
+    }
+
+    getRestaurantById = (id: string) => {
+        return this.findById(id, 'foods');
+    };
 }
 
 const VendorService = new VendorServiceClass();
