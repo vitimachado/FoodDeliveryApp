@@ -5,6 +5,7 @@ import { DocumentDTO } from "../dto/Common.dto";
 import { CreateFoodInputs } from "../dto/Food.dto";
 import { BaseDbService } from "./CommonDbService";
 import FoodService from "./FoodServices";
+import { FoodDocument } from "../models/Food";
 
 class VendorServiceClass extends BaseDbService<VendorDocument>{
     constructor() {
@@ -86,11 +87,36 @@ class VendorServiceClass extends BaseDbService<VendorDocument>{
 
     getAvailableFoods = (pinCode?: string): Promise<DocumentDTO<VendorDocument>> => {
         return VendorService.find(
-            { pinCode, serviceAvailable: true},
+            { pinCode, serviceAvailable: true },
             { rating: "descending" },
+            null,
             'foods'
         )
     };
+
+    getTopRestaturants = (pinCode?: string, limit: number = 0): Promise<DocumentDTO<VendorDocument>> => {
+        return VendorService.find(
+            { pinCode, serviceAvailable: true },
+            { rating: "descending" },
+            limit,
+            'foods'
+        )
+    };
+
+    getFoodAvaiableByReadyTime(pinCode: string, readTime: number = 0) {
+        return VendorService.find(
+            { pinCode, serviceAvailable: true },
+            { rating: "descending" },
+            null,
+            'foods'
+        ).then(vendors => {
+            return vendors.reduce((acc: [FoodDocument], vendor: VendorDocument) => {
+                const foods = vendor.foods;
+                const filteredFoods = foods.filter((food: FoodDocument) => food.readyTime <= readTime) as [FoodDocument];
+                return [ ...acc, ...filteredFoods ];
+            }, []);
+        });
+    }
 }
 
 const VendorService = new VendorServiceClass();

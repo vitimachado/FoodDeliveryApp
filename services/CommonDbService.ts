@@ -7,25 +7,26 @@ interface QueryFind<T> {
     filter?: FilterQuery<T>;
     sort?: Sort<T>;
     populate?: string;
+    limit?: number;
 }
    
 const findQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any>  => {
-    const { filter, sort, populate } = options || {};
+    const { filter, sort, populate, limit } = options || {};
     return dbModel
         .find(filter || {})
         .sort(sort as QuerySort<T>)
-        .populate(populate || '');
+        .populate(populate || '')
+        .limit(limit || 0);
 };
    
 const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any>  => {
-    const { filter, sort, populate } = options || {};
+    const { filter, populate } = options || {};
     return dbModel
         .findOne(filter || {})
-        .sort(sort as QuerySort<T>)
-        .populate(populate || '');
+        .populate(populate || '')
 };
 
-export class BaseDbService<T> {
+ export class BaseDbService<T> {
     protected dbModel!: Model<T>;
 
     constructor(dbModel: Model<T>) {
@@ -37,8 +38,8 @@ export class BaseDbService<T> {
                         await findQuery(this.dbModel, options);
     };
 
-    find = (filter?: FilterQuery<T>, sort?: Sort<T>, populate?: string): Promise<any>  => {
-        return this.findQuery({ filter, sort, populate });
+    find = (filter?: FilterQuery<T>, sort?: Sort<T>, limit?: number | null, populate?: string): Promise<any>  => {
+        return this.findQuery({ filter, sort, limit: limit || 0, populate });
     };
 
     findOne = (filter: FilterQuery<T>, populate?: string): Promise<any>  => {

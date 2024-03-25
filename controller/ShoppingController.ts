@@ -13,11 +13,27 @@ export const GetFoodAvailability = async (req: Request, res: Response, next: Nex
 };
 
 export const GetTopRestaturants = async (req: Request, res: Response, next: NextFunction) => {
-
+    const pinCode = req.params.pinCode;
+    const limit = Number(req.params.limit || 0);
+    VendorService.getTopRestaturants(pinCode, limit)
+    .then(result => {
+        return res.status(200).json(result);
+    })
+    .catch(err => {
+        return res.status(400).json({ message: err });
+    });
 };
 
-export const GetFoodAvaiable30Min = async (req: Request, res: Response, next: NextFunction) => {
-
+export const GetFoodsAvaiableByReadyTime = async (req: Request, res: Response, next: NextFunction) => {
+    const pinCode = req.params.pinCode;
+    const lessThan = Number(req.params.lessThan || 30);
+    VendorService.getFoodAvaiableByReadyTime(pinCode, lessThan)
+    .then(result => {
+        return res.status(200).json(result);
+    })
+    .catch(err => {
+        return res.status(400).json({ message: err });
+    });
 };
 
 export const GetSearchFood = async (req: Request, res: Response, next: NextFunction) => {
