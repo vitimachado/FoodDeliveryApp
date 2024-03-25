@@ -1,4 +1,4 @@
-export interface CreateVendorInput {
+export interface CreateRestaurantInput {
     name: string;
     ownerName: string;
     foodTypes: [string];
@@ -9,19 +9,19 @@ export interface CreateVendorInput {
     password: string;
 }
 
-export interface EditVendorInput {
+export interface EditRestaurantInput {
     name: string;
     address: string;
     phone: string;
     foodTypes: [string];
 }
 
-export interface VendorLoginInput {
+export interface RestaurantLoginInput {
     email: string;
     password: string;
 }
 
-export interface VendorPayload {
+export interface RestaurantPayload {
     _id: string;
     email: string;
     name: string;

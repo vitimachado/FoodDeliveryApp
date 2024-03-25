@@ -15,7 +15,7 @@ export const promiseWrap = (asyncFunction: PromiseCall): any => {
 };
 
 export const checkInArrayIfHasString = (str: string, arrString: string[]): boolean =>{
-    return arrString.some(substr => str.includes(substr));
+    return arrString.some(substr => str.toLowerCase().includes(substr.toLowerCase()));
 };
 
 

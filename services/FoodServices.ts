@@ -9,12 +9,12 @@ class FoodServiceClass extends BaseDbService<FoodDocument>{
         super(Food);
     }
 
-    createFood = (vendorId: string, food: CreateFoodInputs): Promise<DocumentDTO<FoodDocument>>  => {
-        return this.dbModel.create({ ...food, vendorId });
+    createFood = (restaurantId: string, food: CreateFoodInputs): Promise<DocumentDTO<FoodDocument>>  => {
+        return this.dbModel.create({ ...food, restaurantId });
     };
 
     getFoods = (user?: AuthPayload): Promise<FoodDocument[]>  => {
-        return this.dbModel.find({ vendorId: user?._id });
+        return this.dbModel.find({ restaurantId: user?._id });
     };
 }
 

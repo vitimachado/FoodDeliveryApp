@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface FoodDocument extends Document {
-    vendorId: string;
+    restaurantId: string;
     name: string;
     description: string;
     category: string;
@@ -13,7 +13,7 @@ export interface FoodDocument extends Document {
 };
 
 const FoodSchema = new Schema({
-    vendorId: { type: String, required: true },
+    restaurantId: { type: String, required: true },
     name: { type: String, required: true },
     description: { type: String, required: true },
     category: { type: String },

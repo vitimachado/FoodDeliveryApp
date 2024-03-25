@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface VendorDocument extends Document {
+export interface RestaurantDocument extends Document {
     name: string;
     ownerName: string;
     foodTypes: [string];
@@ -16,7 +16,7 @@ export interface VendorDocument extends Document {
     foods: any;
 };
 
-const VendorSchema = new Schema({
+const RestaurantSchema = new Schema({
     name: { type: String, required: true },
     ownerName: { type: String, required: true },
     foodTypes: { type: [String], default: [] },
@@ -46,6 +46,6 @@ const VendorSchema = new Schema({
     timestamps: true
 });
 
-const Vendor = mongoose.model<VendorDocument>('vendor', VendorSchema);
+const Restaurant = mongoose.model<RestaurantDocument>('restaurant', RestaurantSchema);
 
-export { Vendor };
+export { Restaurant };

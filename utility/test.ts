@@ -1,4 +1,4 @@
-const CreateVendorTest = {
+const CreateRestaurantTest = {
     "name": "Vitor",
     "address": "Street Address",
     "email": "email@vitor.com",

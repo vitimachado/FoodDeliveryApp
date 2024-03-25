@@ -89,7 +89,7 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
                     const updatedUser = await result.save();
                     resolve(updatedUser);
                 }
-                return reject({ error: 'LoginError', status: 401, message: 'User Not Found.' });
+                return reject({ error: 'LoginError', status: 401, message: 'User not logged.' });
         });
     };
 
@@ -99,7 +99,7 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
                 if(result !== null) {
                     resolve(result);
                 }
-                return reject({ error: 'LoginError', status: 401, message: 'User Not Found.' });
+                return reject({ error: 'LoginError', status: 401, message: 'User not logged.' });
         });
     };
 
@@ -113,7 +113,7 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
                     const signature = await this.createSignature(updatedUser);
                     resolve(signature);
                 }
-                return reject({ error: 'LoginError', status: 401, message: 'Email or password wrong.' });
+                return reject({ error: 'LoginError', status: 401, message: 'User not logged.' });
         });
     };
 }

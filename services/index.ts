@@ -1,4 +1,4 @@
-export * from './VendorService';
+export * from './RestaurantService';
 export * from './CommonDbService';
 export * from './CustomerService';
 export * from './Database';

@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
-import { CreateVendor, GetVendorById, GetVendors } from '../controller';
+import { CreateRestaurant, GetRestaurantById, GetRestaurants } from '../controller';
 
 const router = express.Router();
 
-router.post('/vendor', CreateVendor);
+router.post('/restaurant', CreateRestaurant);
 
-router.get('/vendors', GetVendors);
+router.get('/restaurants', GetRestaurants);
 
-router.get('/vendor/:id', GetVendorById);
+router.get('/restaurant/:id', GetRestaurantById);
 
 router.get('/', (req: Request, res: Response) => {
     res.json('GET request to the Admin');

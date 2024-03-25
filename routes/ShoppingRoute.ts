@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/:pinCode', GetFoodAvailability);
 
 /** -------------------- Top Restaturants ---------------------- **/
-router.get('/top-restaurants/:limit/:pinCode', GetTopRestaturants);
+router.get('/top-restaurants/:limit/:pinCode?', GetTopRestaturants);
 
 /** ------------------- Food Avaiable on 30min ----------------- **/
 router.get('/foods-ready-time-less-than/:lessThan/:pinCode', GetFoodsAvaiableByReadyTime);

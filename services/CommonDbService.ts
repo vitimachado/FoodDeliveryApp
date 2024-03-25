@@ -54,17 +54,17 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
     findByIdAndUpdate = (id: string | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
         return new Promise((resolve, reject) => {
             if(!id) {
-                reject("Call Without Id.");
+                return reject("Call Without Id.");
             }
             (async () => {
                 try {
-                    const vendor = await this.dbModel.findByIdAndUpdate(id, editValues, options);
-                    if(vendor === null) {
-                        reject("Data not available.");
+                    const restaurant = await this.dbModel.findByIdAndUpdate(id, editValues, options);
+                    if(restaurant === null) {
+                        return reject("Data not available.");
                     }
-                    resolve(vendor);
+                    resolve(restaurant);
                 } catch (error) {
-                    reject("Data not available.");
+                    return reject("Data not available.");
                 }
             })()
         });

@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { CreateVendorInput } from "../dto";
-import VendorService from "../services/VendorService";
+import { CreateRestaurantInput } from "../dto";
+import RestaurantService from "../services/RestaurantService";
 import { responseHandle } from "../utility/CommonUtility";
 
-export const CreateVendor = (req: Request, res: Response, next: NextFunction) => {
-    const vendor = <CreateVendorInput>req.body;
-    responseHandle(res, VendorService.createVendorService(vendor));
+export const CreateRestaurant = (req: Request, res: Response, next: NextFunction) => {
+    const restaurant = <CreateRestaurantInput>req.body;
+    responseHandle(res, RestaurantService.createRestaurantService(restaurant));
 };
 
-export const GetVendors = async (req: Request, res: Response, next: NextFunction) => {
-    responseHandle(res, VendorService.find());
+export const GetRestaurants = async (req: Request, res: Response, next: NextFunction) => {
+    responseHandle(res, RestaurantService.find());
 };
 
-export const GetVendorById = async (req: Request, res: Response, next: NextFunction) => {
+export const GetRestaurantById = async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    responseHandle(res, VendorService.findById(id));
+    responseHandle(res, RestaurantService.findById(id));
 };
