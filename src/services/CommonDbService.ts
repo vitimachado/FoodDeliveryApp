@@ -48,7 +48,8 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
     };
 
     findById = (id: string, populate?: string): Promise<any>  => {
-        return this.findQuery({ filter: { _id: id }, populate}, true);
+        const filter = { _id: id } as FilterQuery<T>;
+        return this.findQuery({ filter, populate}, true);
     };
 
     findByIdAndUpdate = (id: string | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
@@ -78,6 +79,9 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
     };
 
     findByEmail = (email: string | undefined) => {
-        return this.findOne({ email });
+        if(!email) {
+            throw new Error('Email mus be passed.');
+        }
+        return this.findOne({ email } as FilterQuery<T>);
     };
 }
