@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { OrderDocument } from "./Order";
 
 export interface RestaurantDocument extends Document {
     name: string;
@@ -14,6 +15,7 @@ export interface RestaurantDocument extends Document {
     coverImage: [string];
     rating: number;
     foods: any;
+    orders: [OrderDocument];
 };
 
 const RestaurantSchema = new Schema({
@@ -32,6 +34,10 @@ const RestaurantSchema = new Schema({
     foods: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'food'
+    }],
+    orders: [{
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'order'
     }]
 }, {
     toJSON: {

@@ -8,12 +8,12 @@ export interface OrderItem {
 
 export interface OrderItemAmount {
     totalAmount: Number;
-    items: [OrderItem];
+    items: OrderItem[];
 };
 
 export interface OrderDocument extends Document {
     orderID: String;
-    items: [OrderItem];
+    items: OrderItem[];
     totalAmount: Number;
     orderDate?: Date;
     paidMethod?: String; // Credit Card, Wallet

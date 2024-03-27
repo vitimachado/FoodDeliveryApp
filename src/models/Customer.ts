@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { OrderDocument } from "./Order";
+import { OrderDocument, OrderItem } from "./Order";
 
 export interface CustomerDocument extends Document {
     email: string;
@@ -13,7 +13,8 @@ export interface CustomerDocument extends Document {
     verified: boolean;
     lat: number;
     lng: number;
-    orders: [OrderDocument]
+    cart: OrderItem[];
+    orders: OrderDocument[];
 };
 
 const CustomerSchema = new Schema({
@@ -28,6 +29,12 @@ const CustomerSchema = new Schema({
     verified: { type: Boolean, required: true, default: false },
     lat: { type: Number, default: 0 },
     lng: { type: Number, default: 0 },
+    cart: [
+        {
+            food: { type: Schema.Types.ObjectId, ref: "food", required: true },
+            unit: { type: Number, required: true  }
+        }
+    ],
     orders: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'order'
