@@ -19,6 +19,20 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
         });
         return { signature, verified: data.verified, email: data.email };
     }
+    
+    // Override
+    findByUser = async (user: AuthPayload | undefined, reject?: (value: unknown) => void): Promise<CustomerDocument | null>  => {
+        if(!user?._id  && reject) {
+            reject({ error: 'FindUserError', status: 401, message: 'User not found.' });
+            return null;
+        }
+        const profile = await this.findById(user?._id || '');
+        if(!profile?.verified && reject) {
+            reject({ error: 'FindUserError', status: 401, message: 'User not verified' });
+            return null;
+        }
+        return profile;
+    };
 
     customerSignUp = async (reqCustomer: CreateCustomerInputs): Promise<CustomerSignature | ErrorHandle> => {
         return promiseWrap(async (resolve, reject) => {
@@ -81,13 +95,13 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
                     return reject({ error: 'Validation', status: 400, message: inputErrors });
                 }
 
-                const result = await this.findByUser<CustomerDocument>(user);
+                const result = await this.findByUser(user, reject);
                 if(result !== null) {
                     result.firstName = customerInputs.firstName;
                     result.lastName = customerInputs.lastName;
                     result.address = customerInputs.address;
                     const updatedUser = await result.save();
-                    resolve(updatedUser);
+                    return resolve(updatedUser);
                 }
                 return reject({ error: 'LoginError', status: 401, message: 'User not logged.' });
         });
@@ -95,7 +109,7 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
 
     getCustomerProfile = (user: AuthPayload | undefined): Promise<CustomerDocument | ErrorHandle>  => {
         return promiseWrap(async (resolve, reject) => {
-                const result = await this.findByUser<CustomerDocument>(user);
+                const result = await this.findByUser(user);
                 if(result !== null) {
                     resolve(result);
                 }
@@ -106,7 +120,7 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
 
     customerVeryfy = (user: AuthPayload | undefined): Promise<CustomerSignature | ErrorHandle>  => {
         return promiseWrap(async (resolve, reject) => {
-                const result = await this.findByUser<CustomerDocument>(user);
+                const result = await this.findByUser(user);
                 if(result !== null) {
                     result.verified = true;
                     const updatedUser = await result.save();

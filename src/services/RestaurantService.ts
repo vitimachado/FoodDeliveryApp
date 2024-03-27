@@ -50,7 +50,7 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
         });
     };
 
-    restaurantProfile = (user?: AuthPayload): Promise<DocumentDTO<RestaurantDocument>>  => {
+    restaurantProfile = (user?: AuthPayload): Promise<RestaurantDocument | null>  => {
         return this.findByUser(user);
     };
 
@@ -58,20 +58,26 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
         return this.findByIdAndUpdate(user?._id, editRestaurant);
     };
 
-    updateRestaurantService = (user: AuthPayload | undefined): Promise<DocumentDTO<RestaurantDocument>>  => {
+    updateRestaurantService = (user: AuthPayload | undefined): Promise<RestaurantDocument | null>  => {
         return this.findByUser(user)
             .then((restaurant) => {
-                restaurant.serviceAvailable = !restaurant.serviceAvailable;
-                return restaurant.save();
+                if(restaurant) {
+                    restaurant.serviceAvailable = !restaurant.serviceAvailable;
+                    return restaurant.save();
+                }
+                return null;
             });
     };
 
-    addFoodRestaurant = (user: AuthPayload | undefined, foodInputs: CreateFoodInputs): Promise<DocumentDTO<RestaurantDocument>>  => {
+    addFoodRestaurant = (user: AuthPayload | undefined, foodInputs: CreateFoodInputs): Promise<RestaurantDocument | null>  => {
         return this.findByUser(user)
             .then(async (restaurant) => {
-                const food = await FoodService.createFood(restaurant._id, foodInputs);
-                restaurant.foods.push(food);
-                return restaurant.save();
+                if(restaurant) {
+                    const food = await FoodService.createFood(restaurant._id, foodInputs);
+                    restaurant.foods.push(food);
+                    return restaurant.save();
+                }
+                return null;
             });
     };
 

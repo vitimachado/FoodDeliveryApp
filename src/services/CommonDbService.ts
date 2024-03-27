@@ -7,7 +7,7 @@ type Sort<T> = Partial<QuerySort<T>>;
 interface QueryFind<T> {
     filter?: FilterQuery<T>;
     sort?: Sort<T>;
-    populate?: string;
+    populate?: any;
     limit?: number;
 }
    
@@ -34,22 +34,26 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
         this.dbModel = dbModel;
     }
     
-    private findQuery = async (options?: QueryFind<T>, findOne = false): Promise<any>  => {
+    private findQuery = async (options?: QueryFind<T>, findOne = false): Promise<T>  => {
         return findOne ? await findOneQuery(this.dbModel, options) :
                         await findQuery(this.dbModel, options);
     };
 
-    find = (filter?: FilterQuery<T>, sort?: Sort<T>, limit?: number | null, populate?: string): Promise<any>  => {
+    find = (filter?: FilterQuery<T>, sort?: Sort<T>, limit?: number | null, populate?: any): Promise<any>  => {
         return this.findQuery({ filter, sort, limit: limit || 0, populate });
     };
 
-    findOne = (filter: FilterQuery<T>, populate?: string): Promise<any>  => {
+    findObjectQuery = (objQuery: { filter?: FilterQuery<T>; sort?: Sort<T>; limit?: number; populate?: any }): Promise<any>  => {
+        return this.findQuery(objQuery);
+    };
+
+    findOne = (filter: FilterQuery<T>, populate?: any): Promise<T>  => {
         return this.findQuery({ filter, populate }, true)
     };
 
-    findById = (id: string, populate?: string): Promise<any>  => {
+    findById = (id: string, populate?: any): Promise<T>  => {
         const filter = { _id: id } as FilterQuery<T>;
-        return this.findQuery({ filter, populate}, true);
+        return this.findQuery({ filter, populate }, true);
     };
 
     findByIdAndUpdate = (id: string | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
@@ -71,7 +75,7 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
         });
     };
 
-    findByUser = <T = any>(user: AuthPayload | undefined): Promise<T>  => {
+    findByUser = (user: AuthPayload | undefined): Promise<T | null>  => {
         if(!user?._id) {
             throw new Error('User not found');
         }
