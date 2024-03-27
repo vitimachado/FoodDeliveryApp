@@ -13,12 +13,11 @@ export const GetOrders = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const GetOrderById = (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params?.id;
+    responseHandle(res, OrderService.getOrderById(id));
+};
+
+export const GetOrderByOrderId = (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params?.orderId;
-    if(orderId) {
-        responseHandle(res, OrderService.getOrderByOrderId(orderId));
-    }
-    else {
-        const id = req.params?.id;
-        responseHandle(res, OrderService.getOrderById(id));
-    }
+    responseHandle(res, OrderService.getOrderByOrderId(orderId));
 };
