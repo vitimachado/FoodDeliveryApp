@@ -56,7 +56,7 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
         return this.findQuery({ filter, populate }, true);
     };
 
-    findByIdAndUpdate = (id: string | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
+    findByIdAndUpdate = (id: string | String | undefined, editValues: UpdateQuery<T>, options: QueryOptions<T> = { returnDocument: 'after' }): Promise<any>  => {
         return new Promise((resolve, reject) => {
             if(!id) {
                 return reject("Call Without Id.");

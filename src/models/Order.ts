@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { FoodDocument } from "./Food";
+import { OrderStatus } from "../dto/Order.dto";
 
 export interface OrderItem {
     food: FoodDocument;
@@ -15,17 +16,21 @@ export interface OrderItemAmount {
 export interface OrderDocument extends Document {
     orderID: String;
     restaurantId: String;
+    deliveryId?: String;
     items: OrderItem[];
     totalAmount: Number;
     orderDate?: Date;
     paidMethod?: String; // Credit Card, Wallet
     paymentResponse?: Number;
-    orderStatus?: String;
+    orderStatus?: OrderStatus;
+    comment?: String;
+    readyTime: number;
 };
 
 const OrderSchema = new Schema({
     orderID: { type: String, required: true },
     restaurantId: { type: String, required: true },
+    deliveryId: { type: String },
     items: [
         {
             food: { type: Schema.Types.ObjectId, ref: "food", required: true },
@@ -36,7 +41,9 @@ const OrderSchema = new Schema({
     orderDate: { type: Date, default: Date.now() },
     paidMethod: { type: [String] },
     paymentResponse: { type: Number },
-    orderStatus: { type: String }
+    orderStatus: { type: String },
+    comment: { type: String },
+    readyTime: { type: Number }
 }, {
     toJSON: {
         transform(doc, ret){

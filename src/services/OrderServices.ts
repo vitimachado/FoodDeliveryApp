@@ -1,5 +1,5 @@
 import { AuthPayload } from "../dto";
-import { OrderInputs } from "../dto/Order.dto";
+import { OrderInputs, OrderStatus } from "../dto/Order.dto";
 import { FoodDocument } from "../models/Food";
 import { Order, OrderDocument, OrderItem } from "../models/Order";
 import { promiseWrap } from "../utility/CommonUtility";
@@ -23,7 +23,7 @@ class OrderServiceClass extends BaseDbService<OrderDocument>{
                         restaurantId: amountOrders.restaurantId,
                         items: amountOrders.items,
                         totalAmount: amountOrders.totalAmount,
-                        orderStatus: 'Created'
+                        orderStatus: OrderStatus.CREATED
                     });
     
                     if(createdOrder) {
@@ -60,6 +60,10 @@ class OrderServiceClass extends BaseDbService<OrderDocument>{
 
     getOrders = (): Promise<OrderDocument[]>  => {
         return this.dbModel.find().populate('items.food');
+    };
+
+    processOrder = (orderId: String, orderStatus: OrderStatus): Promise<OrderDocument[]>  => {
+        return this.findByIdAndUpdate(orderId, { orderStatus });
     };
 }
 

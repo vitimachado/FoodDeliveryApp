@@ -13,7 +13,7 @@ class FoodServiceClass extends BaseDbService<FoodDocument>{
 
     private countAmountFood(orders: [OrderInputs], foodOrders: FoodDocument[]): OrderItemAmount {
         const amountOrders = orders.reduce((acc: any, order: OrderInputs) => {
-            const food = foodOrders.find(food => food.id === order._id);
+            const food = foodOrders.find(food => food.id === order.foodId);
             return !!food ? {
                 restaurantId: food.restaurantId,
                 totalAmount: acc.totalAmount + (food.price * order.unit),
@@ -33,7 +33,7 @@ class FoodServiceClass extends BaseDbService<FoodDocument>{
     };
 
     getFoodsByOrders = (orders: [OrderInputs]): Promise<FoodDocument[]> => {
-        const ordersId = orders.map(order => order._id);
+        const ordersId = orders.map(order => order.foodId);
         return this.dbModel.find().where('_id').in(ordersId).exec();
     };
 

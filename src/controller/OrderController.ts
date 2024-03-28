@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { responseHandle } from "../utility/CommonUtility";
 import OrderService from "../services/OrderServices";
-import { OrderInputs } from "../dto/Order.dto";
+import { OrderInputs, OrderProcessInputs } from "../dto/Order.dto";
 
 export const CreateOrder = (req: Request, res: Response, next: NextFunction) => {
     const orderInputs = <[OrderInputs]>req.body;
@@ -21,3 +21,9 @@ export const GetOrderByOrderId = (req: Request, res: Response, next: NextFunctio
     const orderId = req.params?.orderId;
     responseHandle(res, OrderService.getOrderByOrderId(orderId));
 };
+
+export const ProcessOrder = (req: Request, res: Response, next: NextFunction) => {
+    const orderInput = <OrderProcessInputs>req.body;
+    responseHandle(res, OrderService.processOrder(orderInput.id, orderInput.status));
+};
+

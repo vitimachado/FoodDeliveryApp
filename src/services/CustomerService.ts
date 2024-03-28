@@ -16,14 +16,14 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
     }
 
     private adjustCart(cart: OrderItem[], order: OrderInputs, food: FoodDocument) {
-        const { _id, unit } = order;
-        const indexOfOrder = cart.findIndex(orderCart => orderCart.food._id.toString() === _id);
+        const { foodId, unit } = order;
+        const indexOfOrder = cart.findIndex(orderCart => orderCart.food._id.toString() === foodId);
 
         if (indexOfOrder < 0 && unit > 0) { // Not found an order and has units to add - Add new order
             return [...cart, { food, unit }];
         }
         else if (indexOfOrder >= 0 && unit === 0) { // Found a order and zero units - Delete order
-            return cart.filter(orderCart => orderCart.food._id.toString() !== _id);
+            return cart.filter(orderCart => orderCart.food._id.toString() !== foodId);
         }
         else if (indexOfOrder >= 0 && unit > 0) { // Found a order and has units to add - Edit order
             cart[indexOfOrder] = { food, unit };
@@ -181,7 +181,7 @@ class CustomerServiceClass extends BaseDbService<CustomerDocument>{
     addOrderCart = async (user: AuthPayload | undefined, order: OrderInputs): Promise<OrderDocument | undefined>  => {
         return promiseWrap(async (resolve, reject) => {
             if (user) {
-                const food = await FoodService.findById(order._id);
+                const food = await FoodService.findById(order.foodId);
 
                 if(food) {
                     const profile = await CustomerService.findById(user._id, 'cart.food');
