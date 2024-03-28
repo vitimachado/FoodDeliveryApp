@@ -7,6 +7,7 @@ import { BaseDbService } from "./CommonDbService";
 import FoodService from "./FoodServices";
 import { FoodDocument } from "../models/Food";
 import { checkInArrayIfHasString, promiseWrap } from "../utility/CommonUtility";
+import OrderService from "./OrderServices";
 
 class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
     constructor() {
@@ -133,10 +134,14 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
 
     getOrders = (user: AuthPayload | undefined): Promise<RestaurantDocument | null>  => {
         return promiseWrap(async (resolve, reject) => {
-            const restaurant = await this.findByUser(user)
-            if(restaurant) {
-                
-                return restaurant.save();
+            const result = await OrderService.find(
+                { restaurantId: user?._id },
+                { orderDate: "descending" },
+                null,
+                'items.food'
+            )
+            if (result) {
+                return resolve(result);
             }
             return reject({ error: 'GetError', status: 401, message: 'Not Found.' });
         });
