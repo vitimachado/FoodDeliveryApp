@@ -15,6 +15,7 @@ class FoodServiceClass extends BaseDbService<FoodDocument>{
         const amountOrders = orders.reduce((acc: any, order: OrderInputs) => {
             const food = foodOrders.find(food => food.id === order._id);
             return !!food ? {
+                restaurantId: food.restaurantId,
                 totalAmount: acc.totalAmount + (food.price * order.unit),
                 items: [...acc.items, { food, unit: order.unit }]
             } : acc;

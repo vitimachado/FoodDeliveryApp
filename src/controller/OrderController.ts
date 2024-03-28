@@ -9,7 +9,7 @@ export const CreateOrder = (req: Request, res: Response, next: NextFunction) => 
 };
 
 export const GetOrders = (req: Request, res: Response, next: NextFunction) => {
-    responseHandle(res, OrderService.getOrders(req.user));
+    responseHandle(res, OrderService.getOrders());
 };
 
 export const GetOrderById = (req: Request, res: Response, next: NextFunction) => {
@@ -20,17 +20,4 @@ export const GetOrderById = (req: Request, res: Response, next: NextFunction) =>
 export const GetOrderByOrderId = (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params?.orderId;
     responseHandle(res, OrderService.getOrderByOrderId(orderId));
-};
-
-export const AddCart = (req: Request, res: Response, next: NextFunction) => {
-    const orderInputs = <OrderInputs>req.body;
-    responseHandle(res, OrderService.addOrderCart(req.user, orderInputs));
-};
-
-export const GetCart = (req: Request, res: Response, next: NextFunction) => {
-    responseHandle(res, OrderService.getCartByUser(req.user));
-};
-
-export const DeleteCart = (req: Request, res: Response, next: NextFunction) => {
-    responseHandle(res, OrderService.deleteCartByUser(req.user));
 };

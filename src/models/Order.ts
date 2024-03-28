@@ -7,12 +7,14 @@ export interface OrderItem {
 };
 
 export interface OrderItemAmount {
+    restaurantId?: String;
     totalAmount: Number;
     items: OrderItem[];
 };
 
 export interface OrderDocument extends Document {
     orderID: String;
+    restaurantId: String;
     items: OrderItem[];
     totalAmount: Number;
     orderDate?: Date;
@@ -23,6 +25,7 @@ export interface OrderDocument extends Document {
 
 const OrderSchema = new Schema({
     orderID: { type: String, required: true },
+    restaurantId: { type: String, required: true },
     items: [
         {
             food: { type: Schema.Types.ObjectId, ref: "food", required: true },

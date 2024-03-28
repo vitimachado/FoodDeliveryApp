@@ -32,3 +32,16 @@ export const AddFood = (req: Request, res: Response, next: NextFunction) => {
 export const GetFoods = (req: Request, res: Response, next: NextFunction) => {
     responseHandle(res, FoodService.getFoods(req.user));
 };
+
+export const GetRestaurantOrders = (req: Request, res: Response, next: NextFunction) => {
+    responseHandle(res, RestaurantService.getOrders(req.user));
+};
+
+export const ProcessRestaurantOrder = (req: Request, res: Response, next: NextFunction) => {
+    const foodRestaurant = <CreateFoodInputs>req.body;
+    responseHandle(res, RestaurantService.addFoodRestaurant(req.user, foodRestaurant));
+};
+
+export const GetRestaurantOrder = (req: Request, res: Response, next: NextFunction) => {
+    responseHandle(res, FoodService.getFoods(req.user));
+};

@@ -6,7 +6,7 @@ import { CreateFoodInputs } from "../dto/Food.dto";
 import { BaseDbService } from "./CommonDbService";
 import FoodService from "./FoodServices";
 import { FoodDocument } from "../models/Food";
-import { checkInArrayIfHasString } from "../utility/CommonUtility";
+import { checkInArrayIfHasString, promiseWrap } from "../utility/CommonUtility";
 
 class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
     constructor() {
@@ -14,24 +14,21 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
     }
         
     createRestaurantService = (restaurant: CreateRestaurantInput): Promise<DocumentDTO<RestaurantDocument>>  => {
-        return new Promise((resolve, reject) => {
-            (async () => { 
+        return promiseWrap(async (resolve, reject) => {
                 const hasRestaurant = await this.findByEmail(restaurant.email);
                 if(hasRestaurant !== null) {
-                    return reject("This email is already in use.");
+                    return reject({ error: 'CreateError', status: 401, message: 'This email is already in use.' });
                 }
                 const salt = await GenerateSalt();
                 const password = await GeneratePassword(restaurant.password, salt);
                 const createRestaurant = await this.dbModel.create({ foods: [], ...restaurant, salt, password });
                 return resolve(createRestaurant);
-            })()
         });
     };
 
     restaurantLogin = (restaurant: RestaurantLoginInput): Promise<string>  => {
         const { email, password } = restaurant;
-        return new Promise((resolve, reject) => {
-            (async () => {
+        return promiseWrap(async (resolve, reject) => {
                 const hasUser = await this.findByEmail(email);
                 if(hasUser !== null) {
                     const validation = await ValidatePassword(password, hasUser.password, hasUser.salt);
@@ -45,8 +42,7 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
                         return resolve(signature);
                     }
                 }
-                return reject("The email or password is wrong.");
-            })()
+                return reject({ error: 'LoginError', status: 401, message: 'Email or password wrong.' });
         });
     };
 
@@ -134,6 +130,17 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
     getRestaurantById = (id: string) => {
         return this.findById(id, 'foods');
     };
+
+    getOrders = (user: AuthPayload | undefined): Promise<RestaurantDocument | null>  => {
+        return promiseWrap(async (resolve, reject) => {
+            const restaurant = await this.findByUser(user)
+            if(restaurant) {
+                
+                return restaurant.save();
+            }
+            return reject({ error: 'GetError', status: 401, message: 'Not Found.' });
+        });
+    }
 }
 
 const RestaurantService = new RestaurantServiceClass();
