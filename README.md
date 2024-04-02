@@ -13,8 +13,8 @@ In the project directory, you can run:
 To install project dependencies.
 
 Need to add a file `.env` with this variables:
-MONGO_URI
-APP_SECRET_JWT
+MONGO_URI, 
+APP_SECRET_JWT, 
 PORT
 
 ### `npm run dev`
