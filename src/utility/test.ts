@@ -5,6 +5,5 @@ const CreateRestaurantTest = {
     "foodTypes": ["japanese", "vegetarian"],
     "ownerName": "ownerName",
     "password": "password",
-    "phone": "8834565456",
-    "pinCode": "1234567890123456789"
+    "phone": "8834565456"
 };

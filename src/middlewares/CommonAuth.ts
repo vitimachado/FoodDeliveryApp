@@ -18,10 +18,10 @@ export const Authenticate = async (req: Request, res: Response, next: NextFuncti
             next();
         }
         else {
-            return res.json({ error: 'Not Authorized' });
+            return res.status(401).json({ error: 'Not Authorized' });
         }
     } catch (error) {
-        return res.json({ error: 'Not Authorized' });
+        return res.status(401).json({ error: 'Not Authorized' });
     }
 };
 

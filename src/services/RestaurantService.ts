@@ -1,4 +1,4 @@
-import { AuthPayload, CreateRestaurantInput, EditRestaurantInput, RestaurantLoginInput } from "../dto";
+import { AuthPayload, CreateRestaurantInputs, EditRestaurantInput, RestaurantLoginInput } from "../dto";
 import { Restaurant, RestaurantDocument } from "../models";
 import { GeneratePassword, GenerateSalt, GenerateSignature, ValidatePassword } from "../utility";
 import { DocumentDTO } from "../dto/Common.dto";
@@ -6,7 +6,7 @@ import { CreateFoodInputs } from "../dto/Food.dto";
 import { BaseDbService } from "./CommonDbService";
 import FoodService from "./FoodServices";
 import { FoodDocument } from "../models/Food";
-import { checkInArrayIfHasString, promiseWrap } from "../utility/CommonUtility";
+import { checkInArrayIfHasString, promiseWrap, validateAndGetInputs } from "../utility/CommonUtility";
 import OrderService from "./OrderServices";
 
 class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
@@ -14,15 +14,21 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
         super(Restaurant);
     }
         
-    createRestaurantService = (restaurant: CreateRestaurantInput): Promise<DocumentDTO<RestaurantDocument>>  => {
+    createRestaurantService = (restaurant: CreateRestaurantInputs): Promise<DocumentDTO<RestaurantDocument>>  => {
         return promiseWrap(async (resolve, reject) => {
-                const hasRestaurant = await this.findByEmail(restaurant.email);
+            
+                const [inputErrors, restaurantInputs] = await validateAndGetInputs(CreateRestaurantInputs, restaurant);
+                if(inputErrors.length > 0) {
+                    return reject({ error: 'Validation', status: 400, message: inputErrors });
+                }
+
+                const hasRestaurant = await this.findByEmail(restaurantInputs.email);
                 if(hasRestaurant !== null) {
                     return reject({ error: 'CreateError', status: 401, message: 'This email is already in use.' });
                 }
                 const salt = await GenerateSalt();
-                const password = await GeneratePassword(restaurant.password, salt);
-                const createRestaurant = await this.dbModel.create({ foods: [], ...restaurant, salt, password });
+                const password = await GeneratePassword(restaurantInputs.password, salt);
+                const createRestaurant = await this.dbModel.create({ foods: [], ...restaurantInputs, salt, password });
                 return resolve(createRestaurant);
         });
     };
@@ -78,17 +84,17 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
             });
     };
 
-    getAvailableFoods = (pinCode?: string): Promise<DocumentDTO<RestaurantDocument>> => {
+    getAvailableFoods = (id?: string): Promise<DocumentDTO<RestaurantDocument>> => {
         return RestaurantService.find(
-            { pinCode, serviceAvailable: true },
+            { _id: id, serviceAvailable: true },
             { rating: "descending" },
             null,
             'foods'
         )
     };
 
-    getTopRestaturants = (pinCode?: string, limit: number = 0): Promise<DocumentDTO<RestaurantDocument>> => {
-        const query = !!pinCode ? { pinCode: pinCode } : {};
+    getTopRestaturants = (id?: string, limit: number = 0): Promise<DocumentDTO<RestaurantDocument>> => {
+        const query = !!id ? { _id: id } : {};
         return RestaurantService.find(
             { ...query, serviceAvailable: true },
             { rating: "descending" },
@@ -97,9 +103,9 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
         )
     };
 
-    getFoodAvaiableByReadyTime = (pinCode: string, readTime: number = 0) => {
+    getFoodAvaiableByReadyTime = (id: string, readTime: number = 0) => {
         return RestaurantService.find(
-            { pinCode, serviceAvailable: true },
+            { _id: id, serviceAvailable: true },
             { rating: "descending" },
             null,
             'foods'
@@ -112,9 +118,9 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
         });
     }
 
-    getFoods = (pinCode: string, foodsSearch?: string[]) => {
+    getFoods = (id: string, foodsSearch?: string[]) => {
         return RestaurantService.find(
-            { pinCode, serviceAvailable: true },
+            { _id: id, serviceAvailable: true },
             { rating: "descending" },
             null,
             'foods'

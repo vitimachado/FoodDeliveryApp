@@ -83,9 +83,6 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
     };
 
     findByEmail = (email: string | undefined) => {
-        if(!email) {
-            throw new Error('Email mus be passed.');
-        }
         return this.findOne({ email } as FilterQuery<T>);
     };
 }

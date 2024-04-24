@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { CreateRestaurantInput } from "../dto";
+import { CreateRestaurantInputs } from "../dto";
 import RestaurantService from "../services/RestaurantService";
 import { responseHandle } from "../utility/CommonUtility";
 
 export const CreateRestaurant = (req: Request, res: Response, next: NextFunction) => {
-    const restaurant = <CreateRestaurantInput>req.body;
+    const restaurant = <CreateRestaurantInputs>req.body;
     responseHandle(res, RestaurantService.createRestaurantService(restaurant));
 };
 
