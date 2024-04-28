@@ -31,6 +31,6 @@ export const responseHandle = async (res: Response, promiseHandle: Promise<any>)
         return res.status(200).json(result);
     })
     .catch(err => {
-        return res.status(err?.status || 400).json({ message: err });
+        return res.status(err?.status || 400).json({ error: err });
     });
 };

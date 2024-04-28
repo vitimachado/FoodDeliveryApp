@@ -47,7 +47,7 @@ const findOneQuery = <T>(dbModel: Model<T>, options?: QueryFind<T>): Promise<any
         return this.findQuery(objQuery);
     };
 
-    findOne = (filter: FilterQuery<T>, populate?: any): Promise<T>  => {
+    findOne = (filter: FilterQuery<T>, populate?: any): Promise<any>  => {
         return this.findQuery({ filter, populate }, true)
     };
 

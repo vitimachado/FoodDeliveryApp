@@ -85,10 +85,8 @@ class RestaurantServiceClass extends BaseDbService<RestaurantDocument>{
     };
 
     getAvailableFoods = (id?: string): Promise<DocumentDTO<RestaurantDocument>> => {
-        return RestaurantService.find(
+        return RestaurantService.findOne(
             { _id: id, serviceAvailable: true },
-            { rating: "descending" },
-            null,
             'foods'
         )
     };

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import RestaurantService from "../services/RestaurantService";
 import { responseHandle } from "../utility/CommonUtility";
 
-export const GetFoodAvailability = async (req: Request, res: Response, next: NextFunction) => {
+export const GetRestaurantFoodsAvailability = async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     responseHandle(res, RestaurantService.getAvailableFoods(id));
 };

@@ -1,10 +1,10 @@
 import express from 'express';
-import { GetFoodAvailability, GetTopRestaturants, GetSearchFood, GetFoodsAvaiableByReadyTime, GetRestaurantById } from '../controller';
+import { GetRestaurantFoodsAvailability, GetTopRestaturants, GetSearchFood, GetFoodsAvaiableByReadyTime, GetRestaurantById } from '../controller';
 
 const router = express.Router();
 
 /** -------------------- Food Availability --------------------- **/
-router.get('/:id', GetFoodAvailability);
+router.get('/:id', GetRestaurantFoodsAvailability);
 
 /** -------------------- Top Restaturants ---------------------- **/
 router.get('/top-restaurants/:limit/:id?', GetTopRestaturants);

@@ -11,7 +11,11 @@ export const RestaurantLogin = (req: Request, res: Response, next: NextFunction)
 };
 
 export const GetRestaurantProfile = (req: Request, res: Response, next: NextFunction) => {
-    responseHandle(res, RestaurantService.restaurantProfile(req.user));
+    responseHandle(res, RestaurantService.restaurantProfile(req?.user));
+};
+
+export const GetRestaurantAndFoods = async (req: Request, res: Response, next: NextFunction) => {
+    responseHandle(res, RestaurantService.getAvailableFoods(req?.user?._id));
 };
 
 export const UpdateRestaurantProfile = (req: Request, res: Response, next: NextFunction) => {
