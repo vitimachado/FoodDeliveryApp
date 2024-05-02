@@ -15,7 +15,7 @@ export const GetRestaurantProfile = (req: Request, res: Response, next: NextFunc
 };
 
 export const GetRestaurantAndFoods = async (req: Request, res: Response, next: NextFunction) => {
-    responseHandle(res, RestaurantService.getAvailableFoods(req?.user?._id));
+    responseHandle(res, RestaurantService.getRestaurantAndFoods(req?.user?._id));
 };
 
 export const UpdateRestaurantProfile = (req: Request, res: Response, next: NextFunction) => {
