@@ -20,7 +20,7 @@ router.put('/order/:id/process', ProcessRestaurantOrder);
 router.get('/order/:id', GetRestaurantOrder);
 
 router.get('/details', GetRestaurantAndFoods);
-router.get('/details/:id', GetRestaurantFoodsAvailability);
+router.get('/details/:id', GetRestaurantAndFoods);
 
 router.get('/all', GetRestaurants);
 router.get('/:id', GetRestaurantById);
